@@ -13,7 +13,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import DoneIcon from "@mui/icons-material/Done";
 import { EnhancedTableHead } from "../EnhancedTableHead/EnhancedTableHead";
 import { TablePaginationActions } from "feature/main/PagePagination/PagePagination";
-import { ArchiveRequest } from "feature/main/ArchiveRequest/ArchiveRequest";
+import { AddNewArchiveRequest } from "feature/main/AddNewArchiveRequest/UI/AddNewArchiveRequest";
 
 enum Status {
   unprocessed,
@@ -210,7 +210,7 @@ export const Main = () => {
       </Paper>
       <div style={{ marginTop: "50px", display: "flex", justifyContent: "space-between", padding: "20px" }}>
         <FormControlLabel control={<Switch checked={dense} onChange={handleChangeDense} />} label="Dense padding" />
-        <ArchiveRequest />
+        <AddNewArchiveRequest />
       </div>
     </Box>
   );
