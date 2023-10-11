@@ -1,19 +1,17 @@
-import * as React from "react";
+import TablePagination from "@material-ui/core/TablePagination";
+import CloseIcon from "@mui/icons-material/Close";
+import DoneIcon from "@mui/icons-material/Done";
 import Box from "@mui/material/Box";
+import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Switch from "@mui/material/Switch";
-import TablePagination from "@material-ui/core/TablePagination";
-import CloseIcon from "@mui/icons-material/Close";
-import DoneIcon from "@mui/icons-material/Done";
-import { EnhancedTableHead } from "../EnhancedTableHead/EnhancedTableHead";
-import { TablePaginationActions } from "feature/main/PagePagination/PagePagination";
 import { AddNewArchiveRequest } from "feature/main/AddNewArchiveRequest/UI/AddNewArchiveRequest";
+import { TablePaginationActions } from "feature/main/PagePagination/PagePagination";
+import * as React from "react";
+import { EnhancedTableHead } from "../EnhancedTableHead/EnhancedTableHead";
 
 enum Status {
   unprocessed,
@@ -79,25 +77,14 @@ const rows = [
   createData("01/01/2021", 0, 123567098, 0, Period.PERIOD_MONTH, "ИП Иванов И.И.!"),
 ];
 
-function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
+function descendingComparator<T extends { date: string | number }>(a: T, b: T) {
+  return new Date(b.date).getTime() - new Date(a.date).getTime();
 }
 
 export type Order = "asc" | "desc";
 
-function getComparator<Key extends keyof any>(
-  order: Order,
-  orderBy: Key,
-): (a: { [key in Key]: number | string }, b: { [key in Key]: number | string }) => number {
-  return order === "desc"
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
+function getComparator<T extends { date: string | number }>(order: Order) {
+  return order === "desc" ? descendingComparator<T> : (a: T, b: T) => -descendingComparator<T>(a, b);
 }
 
 function stableSort<T>(array: readonly T[], comparator: (a: T, b: T) => number) {
@@ -113,16 +100,12 @@ function stableSort<T>(array: readonly T[], comparator: (a: T, b: T) => number) 
 }
 
 export const Main = () => {
-  const [order, setOrder] = React.useState<Order>("asc");
-  const [orderBy, setOrderBy] = React.useState<keyof Data>("status");
+  const [order, setOrder] = React.useState<Order>("desc");
   const [page, setPage] = React.useState(0);
-  const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
   const handleRequestSort = (event: React.MouseEvent<unknown>, property: keyof Data) => {
-    const isAsc = orderBy === property && order === "asc";
-    setOrder(isAsc ? "desc" : "asc");
-    setOrderBy(property);
+    setOrder(order === "asc" ? "desc" : "asc");
   };
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -133,16 +116,10 @@ export const Main = () => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
-
-  const handleChangeDense = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setDense(event.target.checked);
-  };
-
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
-
+  const emptyRows = 0;
   const visibleRows = React.useMemo(
-    () => stableSort(rows, getComparator(order, orderBy)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-    [order, orderBy, page, rowsPerPage],
+    () => stableSort(rows, getComparator(order)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
+    [order, page, rowsPerPage],
   );
 
   const displayRowsLabel = () => {
@@ -153,13 +130,9 @@ export const Main = () => {
     <Box sx={{ width: "98%", padding: "1% 1%" }}>
       <Paper sx={{ width: "100%", mb: 2 }}>
         <TableContainer>
-          <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={dense ? "small" : "medium"}>
-            <EnhancedTableHead
-              order={order}
-              orderBy={orderBy}
-              onRequestSort={handleRequestSort}
-              rowCount={rows.length}
-            />
+          <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle">
+            {/*<Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={dense ? "small" : "medium"}>*/}
+            <EnhancedTableHead order={order} onRequestSort={handleRequestSort} rowCount={rows.length} />
             <TableBody>
               {visibleRows.map((row) => {
                 return (
@@ -177,10 +150,11 @@ export const Main = () => {
                   </TableRow>
                 );
               })}
+
               {emptyRows > 0 && (
                 <TableRow
                   style={{
-                    height: (dense ? 33 : 53) * emptyRows,
+                    height: 53 * emptyRows,
                   }}
                 >
                   <TableCell colSpan={6} />
@@ -209,7 +183,6 @@ export const Main = () => {
         />
       </Paper>
       <div style={{ marginTop: "50px", display: "flex", justifyContent: "space-between", padding: "20px" }}>
-        <FormControlLabel control={<Switch checked={dense} onChange={handleChangeDense} />} label="Dense padding" />
         <AddNewArchiveRequest />
       </div>
     </Box>

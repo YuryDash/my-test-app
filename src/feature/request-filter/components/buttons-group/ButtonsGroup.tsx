@@ -1,16 +1,23 @@
-import * as React from "react";
-import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
+import Stack from "@mui/material/Stack";
 import { COLORS } from "common/colors/colors";
 import { FC } from "react";
+
+type ButtonValues = {
+  param1: string
+  param2: string
+  param3: string
+}
 
 type Props = {
   title: string;
   names: { first: string; second: string; third: string };
   colors: { color: string; backColor: string };
+  callback: (param: string) => void;
+  buttonValue: ButtonValues;
 };
 
-export const ButtonsGroup: FC<Props> = ({ names, colors, title }) => {
+export const ButtonsGroup: FC<Props> = ({ names, colors, title, callback, buttonValue }) => {
   const styles = {
     fontFamily: "Arial",
     color: colors.color,
@@ -30,13 +37,13 @@ export const ButtonsGroup: FC<Props> = ({ names, colors, title }) => {
     <div>
       <div style={{ marginBottom: "15px", color: COLORS.GRAY }}>{title}</div>
       <Stack spacing={1} direction="row">
-        <Button sx={styles} variant="outlined">
+        <Button onClick={() => callback(buttonValue.param1)} sx={styles} variant="outlined">
           {names.first}
         </Button>
-        <Button sx={styles} variant="outlined">
+        <Button  onClick={() => callback(buttonValue.param2)} sx={styles} variant="outlined">
           {names.second}
         </Button>
-        <Button sx={styles} variant="outlined">
+        <Button  onClick={() => callback(buttonValue.param3)} sx={styles} variant="outlined">
           {names.third}
         </Button>
       </Stack>

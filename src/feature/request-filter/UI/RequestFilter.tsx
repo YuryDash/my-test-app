@@ -10,12 +10,22 @@ import { ButtonsGroup } from "feature/request-filter/components/buttons-group/Bu
 import { SelectorsGroup } from "feature/request-filter/components/selectors-group/SelectorsGroup";
 import { Grid } from "@mui/material";
 import { DatePick } from "feature/request-filter/components/date-pick/DatePick";
+import { useAppDispatch } from "app/store";
+import { setDataFiltersAC } from "feature/main/module/data-reducer";
+
+export type ApplicationStatus = "NEW" | "IN_PROGRESS" | "FINISHED" | "REJECTED";
 
 export const RequestFilter = () => {
   const [expanded, setExpanded] = React.useState<string | false>(false);
+  const dispatch = useAppDispatch();
 
   const handleChange = (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
     setExpanded(isExpanded ? panel : false);
+  };
+
+  const handleSortRequestCallback = (param: string) => {
+    dispatch(setDataFiltersAC({keyword: param}))
+    alert(param);
   };
 
   return (
@@ -29,6 +39,8 @@ export const RequestFilter = () => {
           <Grid container wrap="wrap" gap={2}>
             <Grid item xs={12} sm={6} md={4} lg={4}>
               <ButtonsGroup
+                buttonValue={{ param1: "IN_PROGRESS", param2: "FINISHED", param3: "REJECTED" }}
+                callback={handleSortRequestCallback}
                 title={"Статус заявки"}
                 names={{ first: "В обработке", second: "Обработана", third: "Отклонена" }}
                 colors={{ color: COLORS.GRAY, backColor: COLORS.LIGHT_GRAY }}
@@ -42,6 +54,8 @@ export const RequestFilter = () => {
             </Grid>
             <Grid item xs={12} sm={6} md={6} lg={6}>
               <ButtonsGroup
+                buttonValue={{ param1: "Сегодня", param2: "Неделя", param3: "Месяц" }}
+                callback={handleSortRequestCallback}
                 title={"Быстрый переход"}
                 names={{ first: "Сегодня", second: "Неделя", third: "Месяц" }}
                 colors={{ color: COLORS.ORANGE, backColor: COLORS.LIGHT_GRAY }}

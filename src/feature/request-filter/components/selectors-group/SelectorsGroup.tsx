@@ -3,6 +3,9 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { COLORS } from "common/colors/colors";
+import { useAppDispatch } from "app/store";
+import { DataArchiveFilters } from "feature/main/module/data-types";
+import { setDataFiltersAC } from "feature/main/module/data-reducer";
 
 export const SelectorsGroup = () => {
   const styles = {
@@ -17,9 +20,30 @@ export const SelectorsGroup = () => {
     },
   };
 
-  const [targetValue, setTargetValue] = React.useState("10");
-  const handleChange = (event: SelectChangeEvent) => {
-    setTargetValue(event.target.value);
+  const newFilters: DataArchiveFilters = {
+    dateFrom: null,
+    dateTo: null,
+    keyword: "",
+    documentType: "",
+    documentDirection: "",
+  }
+
+
+  const dispatch = useAppDispatch();
+  const [targetValuePeriod, setTargetValuePeriod] = React.useState("0");
+  const [targetValueDuplex, setTargetDuplexValue] = React.useState("3");
+
+  let a = {} as DataArchiveFilters
+
+  const handleChangePeriod = (event: SelectChangeEvent) => {
+    setTargetValuePeriod(event.target.value);
+    dispatch(setDataFiltersAC(newFilters));
+    console.log(event.target.value);
+  };
+
+  const handleChangeDuplex = (event: SelectChangeEvent) => {
+    setTargetDuplexValue(event.target.value);
+    console.log(event.target.value);
   };
 
   return (
@@ -29,15 +53,15 @@ export const SelectorsGroup = () => {
         <FormControl>
           <Select
             sx={styles}
-            defaultValue={"10"}
+            defaultValue={"0"}
             labelId="demo-simple-select-label"
             id="demo-simple-select"
-            value={targetValue}
-            onChange={handleChange}
+            value={targetValuePeriod}
+            onChange={handleChangePeriod}
           >
-            <MenuItem value={10}>Месяц</MenuItem>
-            <MenuItem value={20}>Неделя</MenuItem>
-            <MenuItem value={30}>День</MenuItem>
+            <MenuItem value={0}>Месяц</MenuItem>
+            <MenuItem value={1}>Неделя</MenuItem>
+            <MenuItem value={2}>День</MenuItem>
           </Select>
         </FormControl>
       </div>
@@ -47,14 +71,14 @@ export const SelectorsGroup = () => {
         <FormControl>
           <Select
             sx={styles}
-            defaultValue={"10"}
+            defaultValue={"3"}
             labelId="demo-simple-select-label"
             id="demo-simple-select"
-            value={targetValue}
-            onChange={handleChange}
+            value={targetValueDuplex}
+            onChange={handleChangeDuplex}
           >
-            <MenuItem value={10}>входящий</MenuItem>
-            <MenuItem value={20}>исходящий</MenuItem>
+            <MenuItem value={3}>Входящий</MenuItem>
+            <MenuItem value={4}>Исходящий</MenuItem>
           </Select>
         </FormControl>
       </div>

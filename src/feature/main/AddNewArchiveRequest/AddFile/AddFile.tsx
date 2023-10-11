@@ -17,4 +17,4 @@ export const AddFile = () => {
     <Grid xs={9} width={100} sx={{ height: "2px", backgroundColor: COLORS.LIGHT_GRAY }}></Grid>
   </Grid>
   )
-}  
+}
