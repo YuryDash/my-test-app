@@ -20,30 +20,15 @@ export const SelectorsGroup = () => {
     },
   };
 
-  const newFilters: DataArchiveFilters = {
-    dateFrom: null,
-    dateTo: null,
-    keyword: "",
-    documentType: "",
-    documentDirection: "",
-  }
-
-
   const dispatch = useAppDispatch();
-  const [targetValuePeriod, setTargetValuePeriod] = React.useState("0");
-  const [targetValueDuplex, setTargetDuplexValue] = React.useState("3");
 
-  let a = {} as DataArchiveFilters
-
-  const handleChangePeriod = (event: SelectChangeEvent) => {
-    setTargetValuePeriod(event.target.value);
-    dispatch(setDataFiltersAC(newFilters));
-    console.log(event.target.value);
-  };
-
-  const handleChangeDuplex = (event: SelectChangeEvent) => {
-    setTargetDuplexValue(event.target.value);
-    console.log(event.target.value);
+  const handleChangeSelectors = (event: SelectChangeEvent) => {
+    const selectValue = event.target.value
+    if(+selectValue < 6){
+      dispatch(setDataFiltersAC({documentDirection: selectValue.toString()}));
+    } else {
+      dispatch(setDataFiltersAC({documentType: selectValue.toString()}));
+    }
   };
 
   return (
@@ -56,12 +41,14 @@ export const SelectorsGroup = () => {
             defaultValue={"0"}
             labelId="demo-simple-select-label"
             id="demo-simple-select"
-            value={targetValuePeriod}
-            onChange={handleChangePeriod}
+            onChange={handleChangeSelectors}
           >
             <MenuItem value={0}>Месяц</MenuItem>
-            <MenuItem value={1}>Неделя</MenuItem>
-            <MenuItem value={2}>День</MenuItem>
+            <MenuItem value={1}>Первый квартал</MenuItem>
+            <MenuItem value={2}>Второй квартал</MenuItem>
+            <MenuItem value={3}>Третий квартал</MenuItem>
+            <MenuItem value={4}>Четвертый квартал</MenuItem>
+            <MenuItem value={5}>Год</MenuItem>
           </Select>
         </FormControl>
       </div>
@@ -71,14 +58,13 @@ export const SelectorsGroup = () => {
         <FormControl>
           <Select
             sx={styles}
-            defaultValue={"3"}
+            defaultValue={"6"}
             labelId="demo-simple-select-label"
             id="demo-simple-select"
-            value={targetValueDuplex}
-            onChange={handleChangeDuplex}
+            onChange={handleChangeSelectors}
           >
-            <MenuItem value={3}>Входящий</MenuItem>
-            <MenuItem value={4}>Исходящий</MenuItem>
+            <MenuItem value={6}>Входящий</MenuItem>
+            <MenuItem value={7}>Исходящий</MenuItem>
           </Select>
         </FormControl>
       </div>

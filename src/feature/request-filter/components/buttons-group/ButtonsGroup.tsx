@@ -1,24 +1,32 @@
-import Button from "@mui/material/Button";
+import Button, { ButtonProps } from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
+import { AppRootState } from "app/store";
 import { COLORS } from "common/colors/colors";
+import { Status, QuickTransition } from "feature/main/module/data-types";
 import { FC } from "react";
+import { useSelector } from "react-redux";
+import styled from "styled-components";
+import { SxProps } from "@mui/system";
+import { Theme } from "@material-ui/core";
 
 type ButtonValues = {
-  param1: string
-  param2: string
-  param3: string
-}
+  param1: Status | QuickTransition;
+  param2: Status | QuickTransition;
+  param3: Status | QuickTransition;
+};
 
 type Props = {
   title: string;
   names: { first: string; second: string; third: string };
   colors: { color: string; backColor: string };
-  callback: (param: string) => void;
+  callback: (param: Status | QuickTransition) => void;
   buttonValue: ButtonValues;
 };
 
 export const ButtonsGroup: FC<Props> = ({ names, colors, title, callback, buttonValue }) => {
-  const styles = {
+  const filter = useSelector<AppRootState, Status | QuickTransition>((state) => state.dataArchive.filters.keyword);
+
+  const StylesButton: SxProps<Theme>  = {
     fontFamily: "Arial",
     color: colors.color,
     border: `2px solid ${colors.color}`,
@@ -33,17 +41,59 @@ export const ButtonsGroup: FC<Props> = ({ names, colors, title, callback, button
     },
   };
 
+  const PickedButton = {
+    fontFamily: "Arial",
+    color: 'white',
+    border: `2px solid ${COLORS.ORANGE}`,
+    borderRadius: "6px",
+    padding: "0px 10px",
+    height: "30px",
+    textTransform: "none",
+    fontWeight: "400",
+    backgroundColor: COLORS.ORANGE,
+    "&:hover": {
+      backgroundColor: COLORS.ORANGE,
+      border: `2px solid ${COLORS.ORANGE}`,
+    },
+  };
+
+  // const PickedButton = styled(Button)<ButtonProps>(({ theme }) => ({
+  //   fontFamily: "Arial",
+  //   color: colors.color,
+  //   border: `2px solid ${colors.color}`,
+  //   borderRadius: "6px",
+  //   padding: "0px 10px",
+  //   height: "30px",
+  //   textTransform: "none",
+  //   fontWeight: "400",
+  //   backgroundColor: COLORS.ORANGE,
+  // }));
+
+  console.log(`${filter} это фильтер который равен кейворд`);
+  console.log(`${buttonValue.param1} это param1`);
+  console.log(`${buttonValue.param2} это param2 `);
+  console.log(`${buttonValue.param3} это param3 `);
+
   return (
     <div>
       <div style={{ marginBottom: "15px", color: COLORS.GRAY }}>{title}</div>
       <Stack spacing={1} direction="row">
-        <Button onClick={() => callback(buttonValue.param1)} sx={styles} variant="outlined">
+        <Button
+          onClick={() => callback(buttonValue.param1)}
+          sx={filter !== buttonValue.param1 ? StylesButton : PickedButton}
+        >
           {names.first}
         </Button>
-        <Button  onClick={() => callback(buttonValue.param2)} sx={styles} variant="outlined">
+        <Button
+          onClick={() => callback(buttonValue.param2)}
+          sx={filter !== buttonValue.param2 ? StylesButton : PickedButton}
+        >
           {names.second}
         </Button>
-        <Button  onClick={() => callback(buttonValue.param3)} sx={styles} variant="outlined">
+        <Button
+          onClick={() => callback(buttonValue.param3)}
+          sx={(filter !== buttonValue.param3) ? StylesButton : PickedButton}
+        >
           {names.third}
         </Button>
       </Stack>

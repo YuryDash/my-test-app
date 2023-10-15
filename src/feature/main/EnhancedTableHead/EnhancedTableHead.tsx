@@ -3,13 +3,15 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
 import TableSortLabel from "@mui/material/TableSortLabel";
-import Box from "@mui/material/Box";
-import { visuallyHidden } from "@mui/utils";
-import { Data, Order } from "../UI/Main";
+
+import { Data } from "../module/data-types";
+
+type Order = "asc" | "desc";
 
 type EnhancedTableProps = {
   onRequestSort: (event: React.MouseEvent<unknown>, property: keyof Data) => void;
   order: Order;
+  orderBy: keyof Data;
   rowCount: number;
 };
 
@@ -60,7 +62,7 @@ const headCells: readonly HeadCell[] = [
 ];
 
 export function EnhancedTableHead(props: EnhancedTableProps) {
-  const { order, onRequestSort } = props;
+  const { order, orderBy, onRequestSort } = props;
   const createSortHandler = (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
     onRequestSort(event, property);
   };
@@ -73,10 +75,15 @@ export function EnhancedTableHead(props: EnhancedTableProps) {
             key={headCell.id}
             align={headCell.numeric ? "right" : "left"}
             sx={{ padding: "15px 20px" }}
-            // sortDirection={orderBy === headCell.id ? order : false}
           >
             {headCell.id === "date" ? (
-              <TableSortLabel onClick={createSortHandler(headCell.id)}>{headCell.label}</TableSortLabel>
+              <TableSortLabel
+                active={orderBy === headCell.id}
+                direction={orderBy === headCell.id ? order : "asc"}
+                onClick={createSortHandler(headCell.id)}
+              >
+                {headCell.label}
+              </TableSortLabel>
             ) : (
               headCell.label
             )}

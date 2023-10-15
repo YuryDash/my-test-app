@@ -7,8 +7,8 @@ import { Grid, TextField, TextFieldProps } from "@mui/material";
 import { COLORS } from "common/colors/colors";
 
 export const DatePick = () => {
-  const [startValue, setStartValue] = React.useState<Dayjs | null>(dayjs("2022-04-17"));
-  const [endValue, setEndValue] = React.useState<Dayjs | null>(dayjs("2022-04-17"));
+  const [startValue, setStartValue] = React.useState<Dayjs | null>(dayjs(""));
+  const [endValue, setEndValue] = React.useState<Dayjs | null>(dayjs(""));
 
   const CustomTextField = (props: TextFieldProps) => {
     return <TextField {...props} size="small" />;
@@ -19,6 +19,7 @@ export const DatePick = () => {
       <div style={{ color: COLORS.GRAY }}>Период</div>
       <Grid container gap={2} mt={2}>
         <DatePicker
+          format="DD.MM.YYYY"
           sx={{ width: "155px" }}
           slots={{ textField: CustomTextField }}
           label="c"
@@ -27,6 +28,7 @@ export const DatePick = () => {
         />
 
         <DatePicker
+          format="DD.MM.YYYY"
           sx={{ width: "155px" }}
           slots={{ textField: CustomTextField }}
           label="по"
