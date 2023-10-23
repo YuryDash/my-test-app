@@ -20,7 +20,8 @@ import dayjs from "dayjs";
 import { setDataFiltersAC } from "../module/data-reducer";
 
 function descendingComparator<T extends { date: string | number }>(a: T, b: T) {
-  return new Date(b.date).getTime() - new Date(a.date).getTime();
+  const dateFormat = "DD.MM.YYYY";
+  return dayjs(b.date, dateFormat).diff(dayjs(a.date, dateFormat));
 }
 
 export type Order = "asc" | "desc";
@@ -46,55 +47,96 @@ export const Main = () => {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const rows = useSelector<AppRootState, DataArchive[]>((state) => state.dataArchive.list);
-  const testValue = useSelector<AppRootState, DataArchiveFilters>((state) => state.dataArchive.filters);
-
+  const filterValues = useSelector<AppRootState, DataArchiveFilters>((state) => state.dataArchive.filters);
 
   const handleRequestSort = () => {
     setOrder(order === "asc" ? "desc" : "asc");
   };
 
   let filteredRows = rows;
-  if (testValue.keyword !== Status.ALL) {
-    filteredRows = rows.filter((el) => el.processingStatus === testValue.keyword);
+  console.log(filteredRows.length)
+
+  if (filterValues.keyword !== Status.ALL) {
+    filteredRows = rows.filter((el) => el.processingStatus === filterValues.keyword);
   }
-//=====================================================================================================
-const today = dayjs();
-const dateFormat = 'DD.MM.YYYY';
+    console.log(filteredRows.length)
 
-if (testValue.keyword !== Status.ALL && testValue.keyword >= 5) {
-  switch (testValue.keyword) {
-    case QuickTransition.NOW:
-      const currentDate = today.startOf('day');
-      filteredRows = rows.filter((el) => {
-        const rowDate = dayjs(el.date, dateFormat);
-        return rowDate.isSame(currentDate, 'day');
-      });
-      break;
+  //=====================================================================================================
+  const today = dayjs();
+  const dateFormat = "DD.MM.YYYY";
 
-    case QuickTransition.WEEK:
-      const weekStart = today.startOf('week');
-      const weekEnd = today.endOf('week');
-      filteredRows = rows.filter((el) => {
-        const rowDate = dayjs(el.date, dateFormat);
-        return rowDate.isAfter(weekStart) && rowDate.isBefore(weekEnd);
-      });
-      break;
+  //=====================================================================================================
 
-    case QuickTransition.MONTH:
-      const monthStart = today.startOf('month');
-      const monthEnd = today.endOf('month');
-      filteredRows = rows.filter((el) => {
-        const rowDate = dayjs(el.date, dateFormat);
-        return rowDate.isAfter(monthStart) && rowDate.isBefore(monthEnd);
-      });
-      break;
+  if (filterValues.keyword !== Status.ALL && filterValues.keyword >= 5) {
+    switch (filterValues.keyword) {
+      case QuickTransition.NOW:
+        const currentDate = today.startOf("day");
+        filteredRows = rows.filter((el) => {
+          const rowDate = dayjs(el.date, dateFormat);
+          return rowDate.isSame(currentDate, "day");
+        });
+        filteredRows.map((el) => {
+          console.log(el.date + " :day");
+        });
+        break;
 
-    default:
-      filteredRows = rows;
-      break;
+      case QuickTransition.WEEK:
+        const weekStart = dayjs().subtract(7, "day").startOf("day");
+        const weekEnd = dayjs().endOf("day");
+        filteredRows = rows.filter((el) => {
+          const rowDate = dayjs(el.date, dateFormat);
+          return (
+            (rowDate.isSame(weekStart, "day") || rowDate.isAfter(weekStart, "day")) &&
+            (rowDate.isSame(weekEnd, "day") || rowDate.isBefore(weekEnd, "day") || rowDate.isSame(weekEnd, "day"))
+          );
+        });
+
+        filteredRows.map((el) => {
+          console.log(el.date + " :week");
+        });
+        break;
+
+      case QuickTransition.MONTH:
+        const monthStart = today.startOf("month");
+        const monthEnd = today.endOf("month");
+        filteredRows = rows.filter((el) => {
+          const rowDate = dayjs(el.date, dateFormat);
+          return rowDate.isAfter(monthStart) && rowDate.isBefore(monthEnd);
+        });
+        filteredRows.map((el) => {
+          console.log(el.date + " :month");
+        });
+        break;
+
+      default:
+        filteredRows = rows;
+        break;
+    }
   }
-}
-//=====================================================================================================
+  //=====================================================================================================
+  console.log(filteredRows.length)
+
+  if (filterValues.dateFrom && filterValues.dateTo) {
+    const startDate = dayjs(filterValues.dateFrom, dateFormat).startOf("day");
+    const endDate = dayjs(filterValues.dateTo, dateFormat).endOf("day");
+
+    if (startDate.isSame(endDate, "day")) {
+      filteredRows = filteredRows.filter((el) => {
+        const rowDate = dayjs(el.date, dateFormat);
+        console.log("rowDate: ПЕРВОЕ", rowDate.format(dateFormat));
+        return rowDate.isSame(startDate, "day");
+      })
+    // } else {
+    //   filteredRows = filteredRows.filter((el , index) => {
+    //     const rowDate = dayjs(el.date, dateFormat);
+    //     console.log(`rowDate: ${index +1}`, rowDate.format(dateFormat));
+    //     return rowDate.isAfter(startDate) && rowDate.isBefore(endDate);
+    //   });
+    //   console.log(filteredRows.length);
+    }
+  }
+
+  console.log(filteredRows.length)
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -105,7 +147,10 @@ if (testValue.keyword !== Status.ALL && testValue.keyword >= 5) {
     setPage(0);
   };
   const emptyRows = 0;
-  const visibleRows = stableSort(filteredRows, getComparator(order)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  const visibleRows = stableSort(filteredRows, getComparator(order)).slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage,
+  );
 
   const displayRowsLabel = () => {
     return "";
@@ -116,7 +161,12 @@ if (testValue.keyword !== Status.ALL && testValue.keyword >= 5) {
       <Paper sx={{ width: "100%", mb: 2 }}>
         <TableContainer>
           <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle">
-            <EnhancedTableHead orderBy="date" order={order} onRequestSort={handleRequestSort} rowCount={filteredRows.length} />
+            <EnhancedTableHead
+              orderBy="date"
+              order={order}
+              onRequestSort={handleRequestSort}
+              rowCount={filteredRows.length}
+            />
             <TableBody>
               {visibleRows.map((row) => {
                 let lol =
@@ -129,7 +179,7 @@ if (testValue.keyword !== Status.ALL && testValue.keyword >= 5) {
                   ) : null;
 
                 return (
-                  <TableRow hover tabIndex={-1} key={row.id} sx={{ cursor: "pointer" }}>
+                  <TableRow hover key={row.id} sx={{ cursor: "pointer" }}>
                     <TableCell component="th" scope="row" padding="normal">
                       {row.date}
                     </TableCell>

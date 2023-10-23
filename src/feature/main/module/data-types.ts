@@ -47,7 +47,7 @@ export type DataArchive = {
   originalDocumentNumber: number;
   organizationName: string;
   documentRepresentation: string;
-  documentType: number;
+  documentType: TypeDoc;
   processingStatus: Status;
   statusComments: string;
   taxPeriodType: Period;

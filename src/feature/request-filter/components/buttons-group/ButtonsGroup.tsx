@@ -1,12 +1,12 @@
-import Button, { ButtonProps } from "@mui/material/Button";
+import { Theme } from "@material-ui/core";
+import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
+import { SxProps } from "@mui/system";
 import { AppRootState } from "app/store";
 import { COLORS } from "common/colors/colors";
-import { Status, QuickTransition } from "feature/main/module/data-types";
+import { QuickTransition, Status } from "feature/main/module/data-types";
 import { FC } from "react";
 import { useSelector } from "react-redux";
-import { SxProps } from "@mui/system";
-import { Theme } from "@material-ui/core";
 
 type ButtonValues = {
   param1: Status | QuickTransition;
@@ -25,7 +25,7 @@ type Props = {
 export const ButtonsGroup: FC<Props> = ({ names, colors, title, callback, buttonValue }) => {
   const filter = useSelector<AppRootState, Status | QuickTransition>((state) => state.dataArchive.filters.keyword);
 
-  const StylesButton: SxProps<Theme>  = {
+  const StylesButton: SxProps<Theme> = {
     fontFamily: "Arial",
     color: colors.color,
     border: `2px solid ${colors.color}`,
@@ -42,7 +42,7 @@ export const ButtonsGroup: FC<Props> = ({ names, colors, title, callback, button
 
   const PickedButton = {
     fontFamily: "Arial",
-    color: 'white',
+    color: "white",
     border: `2px solid ${COLORS.ORANGE}`,
     borderRadius: "6px",
     padding: "0px 10px",
@@ -74,7 +74,7 @@ export const ButtonsGroup: FC<Props> = ({ names, colors, title, callback, button
         </Button>
         <Button
           onClick={() => callback(buttonValue.param3)}
-          sx={(filter !== buttonValue.param3) ? StylesButton : PickedButton}
+          sx={filter !== buttonValue.param3 ? StylesButton : PickedButton}
         >
           {names.third}
         </Button>

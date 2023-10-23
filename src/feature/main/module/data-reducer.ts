@@ -5,20 +5,21 @@ import { setAppStatusAC } from "app/app-reducer";
 import dayjs from "dayjs";
 
 const rows = [
-  // createData(v1(), "02.02.2020", "", 889743242, "ИП Иванов И.И.", "отчет", 0, 0, "lol", Period.PERIOD_YEAR),
-  createData(v1(), "19.10.2023", "", 889743242, "ИП Иванов И.И.", "отчет", 0, 0, "lol", Period.PERIOD_YEAR),
-  createData(v1(), "20.10.2023", "", 889756242, "ИП Иванов И.И.", "отчет", 0, 3, "lol", Period.PERIOD_Q2),
-  createData(v1(), "01.01.2023", "", 965756731, "ИП Иванов И.И.", "отчет", 3, 1, "lol", Period.PERIOD_YEAR),
-  // createData(v1(), "02.03.2020", "", 355432433, "ИП Иванов И.И.", "отчет", 0, 1, "lol", Period.PERIOD_MONTH),
-  // createData(v1(), "2.05.2022", "", 654689983, "ИП Иванов И.И.", "отчет", 1, 1, "lol", Period.PERIOD_Q1),
-  // createData(v1(), "2.05.2023", "", 657567565, "ИП Иванов И.И.", "отчет", 1, 0, "lol", Period.PERIOD_MONTH),
-  // createData(v1(), "12.10.2023", "", 565986798, "ИП Иванов И.И.", "отчет", 0, 1, "lol", Period.PERIOD_Q3),
-  // createData(v1(), "11.10.2021", "", 405909054, "ИП Иванов И.И.", "отчет", 0, 3, "lol", Period.PERIOD_Q3),
-  // createData(v1(), "16.10.2023", "", 405909054, "ИП Иванов И.И.", "отчет", 0, 3, "lol", Period.PERIOD_Q3),
-  // createData(v1(), "17.10.2023", "", 125345788, "ИП Иванов И.И.", "отчет", 0, 3, "lol", Period.PERIOD_MONTH),
-  // createData(v1(), "2.11.2023", "", 876868678, "ИП Иванов И.И.", "отчет", 1, 1, "lol", Period.PERIOD_Q2),
-  // createData(v1(), "2.09.2023", "", 123123213, "ИП Иванов И.И.", "отчет", 0, 0, "lol", Period.PERIOD_Q1),
-  // createData(v1(), "2.09.2022", "", 123134123, "ИП Иванов И.И.", "отчет", 0, 1, "lol", Period.PERIOD_Q4),
+  createData(v1(), "01.01.2020", "", 100000000, "ИП Иванов И.И.", "отчет", 0, 0, "lol", Period.PERIOD_YEAR),
+  createData(v1(), "19.10.2023", "", 200000000, "ИП Иванов И.И.", "отчет", 0, 0, "lol", Period.PERIOD_YEAR),
+  createData(v1(), "20.10.2023", "", 300000000, "ИП Иванов И.И.", "отчет", 0, 3, "lol", Period.PERIOD_YEAR),
+  createData(v1(), "01.01.2023", "", 400000000, "ИП Иванов И.И.", "отчет", 1, 1, "lol", Period.PERIOD_YEAR),
+  createData(v1(), "02.03.2020", "", 500000000, "ИП Иванов И.И.", "отчет", 0, 1, "lol", Period.PERIOD_MONTH),
+  createData(v1(), "02.05.2022", "", 600000000, "ИП Иванов И.И.", "отчет", 1, 1, "lol", Period.PERIOD_Q1),
+  createData(v1(), "02.05.2023", "", 700000000, "ИП Иванов И.И.", "отчет", 1, 0, "lol", Period.PERIOD_MONTH),
+  createData(v1(), "12.10.2023", "", 800000000, "ИП Иванов И.И.", "отчет", 0, 1, "lol", Period.PERIOD_Q3),
+  createData(v1(), "11.10.2021", "", 900000000, "ИП Иванов И.И.", "отчет", 0, 3, "lol", Period.PERIOD_Q3),
+  createData(v1(), "16.10.2023", "", 101000000, "ИП Иванов И.И.", "отчет", 0, 3, "lol", Period.PERIOD_Q3),
+  createData(v1(), "17.10.2023", "", 111000000, "ИП Иванов И.И.", "отчет", 1, 3, "lol", Period.PERIOD_MONTH),
+  createData(v1(), "02.11.2023", "", 120000000, "ИП Иванов И.И.", "отчет", 1, 1, "lol", Period.PERIOD_Q2),
+  createData(v1(), "02.09.2023", "", 130000000, "ИП Иванов И.И.", "отчет", 0, 0, "lol", Period.PERIOD_Q1),
+  createData(v1(), "22.10.2022", "", 140000000, "ИП Иванов И.И.", "отчет", 0, 1, "lol", Period.PERIOD_Q4),
+  createData(v1(), "23.10.2023", "", 150000000, "ИП Иванов И.И.", "отчет", 0, 1, "lol", Period.PERIOD_Q4),
 ];
 function createData(
   id: string,
@@ -49,7 +50,7 @@ function createData(
 const initialState: RecordsState = {
   list: [] as DataArchive[],
   filters: {
-    dateFrom: dayjs().startOf('year').format('DD.MM.YYYY'),
+    dateFrom: dayjs().startOf('year').year(2020).format('DD.MM.YYYY'),
     dateTo: dayjs().startOf('day').format('DD.MM.YYYY'),
     keyword: Status.ALL,
     documentType: "",
@@ -65,7 +66,6 @@ export const dataArchiveReducer = (state: RecordsState = initialState, action: D
         list: [...action.payload.list],
       };
     case "SET_DATA_FILTERS":
-      debugger
       return {
         ...state,
         filters: {
