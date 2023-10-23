@@ -5,7 +5,6 @@ import { COLORS } from "common/colors/colors";
 import { Status, QuickTransition } from "feature/main/module/data-types";
 import { FC } from "react";
 import { useSelector } from "react-redux";
-import styled from "styled-components";
 import { SxProps } from "@mui/system";
 import { Theme } from "@material-ui/core";
 
@@ -56,23 +55,6 @@ export const ButtonsGroup: FC<Props> = ({ names, colors, title, callback, button
       border: `2px solid ${COLORS.ORANGE}`,
     },
   };
-
-  // const PickedButton = styled(Button)<ButtonProps>(({ theme }) => ({
-  //   fontFamily: "Arial",
-  //   color: colors.color,
-  //   border: `2px solid ${colors.color}`,
-  //   borderRadius: "6px",
-  //   padding: "0px 10px",
-  //   height: "30px",
-  //   textTransform: "none",
-  //   fontWeight: "400",
-  //   backgroundColor: COLORS.ORANGE,
-  // }));
-
-  console.log(`${filter} это фильтер который равен кейворд`);
-  console.log(`${buttonValue.param1} это param1`);
-  console.log(`${buttonValue.param2} это param2 `);
-  console.log(`${buttonValue.param3} это param3 `);
 
   return (
     <div>

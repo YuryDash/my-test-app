@@ -5,14 +5,43 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { Grid, TextField, TextFieldProps } from "@mui/material";
 import { COLORS } from "common/colors/colors";
+import { useSelector } from "react-redux";
+import { AppRootState, useAppDispatch } from "app/store";
+import { setDataFiltersAC } from "feature/main/module/data-reducer";
 
 export const DatePick = () => {
-  const [startValue, setStartValue] = React.useState<Dayjs | null>(dayjs(""));
-  const [endValue, setEndValue] = React.useState<Dayjs | null>(dayjs(""));
+  // debugger;
+  const startDate = useSelector<AppRootState, string>((state) => state.dataArchive.filters.dateFrom);
+  const endDate = useSelector<AppRootState, string>((state) => state.dataArchive.filters.dateTo);
+  const dispatch = useAppDispatch()
+
+  console.log(startDate + " " + endDate);
+
+
+  const [startValue, setStartValue] = React.useState<Dayjs | null>(dayjs(startDate));
+  const [endValue, setEndValue] = React.useState<Dayjs | null>(dayjs(endDate, "DD.MM.YYYY").startOf("day"));
+
+  React.useEffect(() => {
+    setStartValue(dayjs(startDate, "DD.MM.YYYY"));
+  }, [startDate]);
+  
+  React.useEffect(() => {
+    setEndValue(dayjs(endDate, "DD.MM.YYYY").startOf("day"));
+  }, [endDate]);
 
   const CustomTextField = (props: TextFieldProps) => {
     return <TextField {...props} size="small" />;
   };
+
+  const onChangeStartDateValue = (newValue: Dayjs | null) => {
+    setStartValue(newValue)
+    dispatch(setDataFiltersAC({dateFrom: dayjs(newValue).format('DD.MM.YYYY')}))
+  }  
+  const onChangeEndDateValue = (newValue: Dayjs | null) => {
+    setEndValue(newValue)
+    dispatch(setDataFiltersAC({dateTo: dayjs(newValue).format('DD.MM.YYYY')}))
+  }
+  console.log(dayjs(startValue).format('DD.MM.YYYY') + " " + dayjs(endValue).format('DD.MM.YYYY'));
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -24,7 +53,7 @@ export const DatePick = () => {
           slots={{ textField: CustomTextField }}
           label="c"
           value={startValue}
-          onChange={(newValue) => setStartValue(newValue)}
+          onChange={onChangeStartDateValue}
         />
 
         <DatePicker
@@ -33,7 +62,7 @@ export const DatePick = () => {
           slots={{ textField: CustomTextField }}
           label="по"
           value={endValue}
-          onChange={(newValue) => setEndValue(newValue)}
+          onChange={onChangeEndDateValue}
         />
       </Grid>
     </LocalizationProvider>

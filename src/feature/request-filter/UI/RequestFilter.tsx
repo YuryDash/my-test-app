@@ -10,20 +10,43 @@ import { ButtonsGroup } from "feature/request-filter/components/buttons-group/Bu
 import { SelectorsGroup } from "feature/request-filter/components/selectors-group/SelectorsGroup";
 import { Grid } from "@mui/material";
 import { DatePick } from "feature/request-filter/components/date-pick/DatePick";
-import { useAppDispatch } from "app/store";
+import { AppRootState, useAppDispatch } from "app/store";
 import { setDataFiltersAC } from "feature/main/module/data-reducer";
 import { Status, QuickTransition } from "feature/main/module/data-types";
+import { useSelector } from "react-redux";
+import dayjs from "dayjs";
 
 export const RequestFilter = () => {
   const [expanded, setExpanded] = React.useState<string | false>(false);
   const dispatch = useAppDispatch();
-
+  const previousKeyword = useSelector<AppRootState, Status | QuickTransition>(state => state.dataArchive.filters.keyword)
   const handleChange = (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
     setExpanded(isExpanded ? panel : false);
   };
 
   const handleSortRequestCallback = (param: Status | QuickTransition) => {
-    dispatch(setDataFiltersAC({keyword: param}))
+
+    if(param >= 5){
+      switch (param) {
+        case QuickTransition.NOW:
+          dispatch(setDataFiltersAC({dateFrom: dayjs().format('DD.MM.YYYY'), dateTo: dayjs().format('DD.MM.YYYY')}))
+          break;
+        default:
+          break;
+      }
+    }
+
+    if (param === previousKeyword) {
+      dispatch(
+        setDataFiltersAC({
+          keyword: Status.ALL,
+          dateFrom: dayjs().startOf("year").format("DD.MM.YYYY"),
+          dateTo: dayjs().startOf("day").format("DD.MM.YYYY"),
+        }),
+      );
+    } else {
+      dispatch(setDataFiltersAC({ keyword: param }));
+    }
   };
 
   return (
@@ -52,7 +75,7 @@ export const RequestFilter = () => {
             </Grid>
             <Grid item xs={12} sm={6} md={6} lg={6}>
               <ButtonsGroup
-                buttonValue={{ param1: QuickTransition.MONTH, param2: QuickTransition.NOW, param3: QuickTransition.WEEK }}
+                buttonValue={{ param1: QuickTransition.NOW, param2: QuickTransition.WEEK, param3: QuickTransition.MONTH }}
                 callback={handleSortRequestCallback}
                 title={"Быстрый переход"}
                 names={{ first: "Сегодня", second: "Неделя", third: "Месяц" }}

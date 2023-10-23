@@ -1,6 +1,5 @@
 import { SetAppErrorAT } from "app/app-reducer";
 import { setDataArchiveAC, setDataFiltersAC } from "./data-reducer";
-import { type } from "os";
 
 type SetDataFiltersAT = ReturnType<typeof setDataFiltersAC>;
 type SetDataArchiveAT = ReturnType<typeof setDataArchiveAC>;
@@ -55,8 +54,8 @@ export type DataArchive = {
 };
 
 export type DataArchiveFilters = {
-  dateFrom: string | null;
-  dateTo: string | null;
+  dateFrom: string;
+  dateTo: string;
   keyword: Status | QuickTransition;
   documentType: string;
   documentDirection: string;

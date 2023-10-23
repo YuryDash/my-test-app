@@ -8,13 +8,16 @@ import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableRow from "@mui/material/TableRow";
-import { AppRootState } from "app/store";
+import { AppRootState, useAppDispatch } from "app/store";
 import { AddNewArchiveRequest } from "feature/main/AddNewArchiveRequest/UI/AddNewArchiveRequest";
 import { TablePaginationActions } from "feature/main/PagePagination/PagePagination";
 import * as React from "react";
 import { useSelector } from "react-redux";
 import { EnhancedTableHead } from "../EnhancedTableHead/EnhancedTableHead";
-import { DataArchive, DataArchiveFilters, Status } from "../module/data-types";
+import { DataArchive, DataArchiveFilters, QuickTransition, Status } from "../module/data-types";
+import CachedIcon from "@mui/icons-material/Cached";
+import dayjs from "dayjs";
+import { setDataFiltersAC } from "../module/data-reducer";
 
 function descendingComparator<T extends { date: string | number }>(a: T, b: T) {
   return new Date(b.date).getTime() - new Date(a.date).getTime();
@@ -42,16 +45,56 @@ export const Main = () => {
   const [order, setOrder] = React.useState<Order>("desc");
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const rows = useSelector<AppRootState, DataArchive[]>(state => state.dataArchive.list) 
-  const testValue = useSelector<AppRootState, DataArchiveFilters>(state => state.dataArchive.filters) 
+  const rows = useSelector<AppRootState, DataArchive[]>((state) => state.dataArchive.list);
+  const testValue = useSelector<AppRootState, DataArchiveFilters>((state) => state.dataArchive.filters);
+
+
   const handleRequestSort = () => {
     setOrder(order === "asc" ? "desc" : "asc");
   };
 
-  let a = rows
-  if(testValue.keyword !== Status.ALL){
-    a = rows.filter(el => el.processingStatus == testValue.keyword)
+  let filteredRows = rows;
+  if (testValue.keyword !== Status.ALL) {
+    filteredRows = rows.filter((el) => el.processingStatus === testValue.keyword);
   }
+//=====================================================================================================
+const today = dayjs();
+const dateFormat = 'DD.MM.YYYY';
+
+if (testValue.keyword !== Status.ALL && testValue.keyword >= 5) {
+  switch (testValue.keyword) {
+    case QuickTransition.NOW:
+      const currentDate = today.startOf('day');
+      filteredRows = rows.filter((el) => {
+        const rowDate = dayjs(el.date, dateFormat);
+        return rowDate.isSame(currentDate, 'day');
+      });
+      break;
+
+    case QuickTransition.WEEK:
+      const weekStart = today.startOf('week');
+      const weekEnd = today.endOf('week');
+      filteredRows = rows.filter((el) => {
+        const rowDate = dayjs(el.date, dateFormat);
+        return rowDate.isAfter(weekStart) && rowDate.isBefore(weekEnd);
+      });
+      break;
+
+    case QuickTransition.MONTH:
+      const monthStart = today.startOf('month');
+      const monthEnd = today.endOf('month');
+      filteredRows = rows.filter((el) => {
+        const rowDate = dayjs(el.date, dateFormat);
+        return rowDate.isAfter(monthStart) && rowDate.isBefore(monthEnd);
+      });
+      break;
+
+    default:
+      filteredRows = rows;
+      break;
+  }
+}
+//=====================================================================================================
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -62,9 +105,7 @@ export const Main = () => {
     setPage(0);
   };
   const emptyRows = 0;
-  const visibleRows =  stableSort(a, getComparator(order)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-   
-  
+  const visibleRows = stableSort(filteredRows, getComparator(order)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
   const displayRowsLabel = () => {
     return "";
@@ -75,17 +116,24 @@ export const Main = () => {
       <Paper sx={{ width: "100%", mb: 2 }}>
         <TableContainer>
           <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle">
-            <EnhancedTableHead orderBy="date" order={order} onRequestSort={handleRequestSort} rowCount={a.length} />
+            <EnhancedTableHead orderBy="date" order={order} onRequestSort={handleRequestSort} rowCount={filteredRows.length} />
             <TableBody>
               {visibleRows.map((row) => {
+                let lol =
+                  row.processingStatus === Status.processed ? (
+                    <DoneIcon color="success" />
+                  ) : row.processingStatus === Status.unprocessed ? (
+                    <CloseIcon color="error" />
+                  ) : row.processingStatus === Status.in_process ? (
+                    <CachedIcon color="info" />
+                  ) : null;
+
                 return (
                   <TableRow hover tabIndex={-1} key={row.id} sx={{ cursor: "pointer" }}>
                     <TableCell component="th" scope="row" padding="normal">
                       {row.date}
                     </TableCell>
-                    <TableCell align="right">
-                      {row.processingStatus ? <DoneIcon color={"success"} /> : <CloseIcon color={"error"} />}
-                    </TableCell>
+                    <TableCell align="right">{lol}</TableCell>
                     <TableCell align="right">№ {row.originalDocumentNumber}</TableCell>
                     <TableCell align="right">{row.documentType ? "входящий" : "исходящий"}</TableCell>
                     <TableCell align="right">{row.taxPeriodType}</TableCell>
@@ -111,7 +159,7 @@ export const Main = () => {
           labelRowsPerPage={"Показывать:"}
           rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
           colSpan={3}
-          count={a.length}
+          count={filteredRows.length}
           rowsPerPage={rowsPerPage}
           page={page}
           SelectProps={{
