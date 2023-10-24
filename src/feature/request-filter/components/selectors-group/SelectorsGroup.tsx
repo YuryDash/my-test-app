@@ -4,7 +4,6 @@ import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { COLORS } from "common/colors/colors";
 import { useAppDispatch } from "app/store";
-import { DataArchiveFilters } from "feature/main/module/data-types";
 import { setDataFiltersAC } from "feature/main/module/data-reducer";
 
 export const SelectorsGroup = () => {
@@ -23,11 +22,11 @@ export const SelectorsGroup = () => {
   const dispatch = useAppDispatch();
 
   const handleChangeSelectors = (event: SelectChangeEvent) => {
-    const selectValue = event.target.value
-    if(+selectValue < 6){
-      dispatch(setDataFiltersAC({documentDirection: selectValue.toString()}));
+    const selectValue = event.target.value;
+    if (+selectValue < 6) {
+      dispatch(setDataFiltersAC({ documentDirection: selectValue.toString() }));
     } else {
-      dispatch(setDataFiltersAC({documentType: selectValue.toString()}));
+      dispatch(setDataFiltersAC({ documentType: selectValue.toString() }));
     }
   };
 

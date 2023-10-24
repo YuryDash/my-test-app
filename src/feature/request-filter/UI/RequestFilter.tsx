@@ -17,8 +17,7 @@ import { useSelector } from "react-redux";
 import dayjs from "dayjs";
 
 export const RequestFilter = () => {
-
-  //TODO 
+  //TODO
   const [expanded, setExpanded] = React.useState<string | false>(false);
   const dispatch = useAppDispatch();
   const previousKeyword = useSelector<AppRootState, Status | QuickTransition>(
@@ -30,14 +29,15 @@ export const RequestFilter = () => {
 
   const handleSortRequestCallback = (param: Status | QuickTransition) => {
     if (param >= 5) {
-      const today = dayjs()
+      const today = dayjs();
       switch (param) {
-
         case QuickTransition.NOW:
+          debugger;
           dispatch(setDataFiltersAC({ dateFrom: today.format("DD.MM.YYYY"), dateTo: today.format("DD.MM.YYYY") }));
           break;
 
         case QuickTransition.WEEK:
+          debugger;
           const weekAgo = today.subtract(1, "week");
           dispatch(
             setDataFiltersAC({
@@ -51,8 +51,8 @@ export const RequestFilter = () => {
           const monthAgo = today.subtract(1, "month");
           dispatch(
             setDataFiltersAC({
-              dateFrom: monthAgo.format("DD.MM.YYYY"), 
-              dateTo: today.format("DD.MM.YYYY"), 
+              dateFrom: monthAgo.format("DD.MM.YYYY"),
+              dateTo: today.format("DD.MM.YYYY"),
             }),
           );
           break;
@@ -65,7 +65,7 @@ export const RequestFilter = () => {
       dispatch(
         setDataFiltersAC({
           keyword: Status.ALL,
-          dateFrom: dayjs().startOf('year').year(2020).format('DD.MM.YYYY'),
+          dateFrom: dayjs().startOf("year").year(2020).format("DD.MM.YYYY"),
           dateTo: dayjs().startOf("day").format("DD.MM.YYYY"),
         }),
       );

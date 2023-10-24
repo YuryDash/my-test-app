@@ -1,4 +1,5 @@
 import TablePagination from "@material-ui/core/TablePagination";
+import CachedIcon from "@mui/icons-material/Cached";
 import CloseIcon from "@mui/icons-material/Close";
 import DoneIcon from "@mui/icons-material/Done";
 import Box from "@mui/material/Box";
@@ -8,16 +9,14 @@ import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableRow from "@mui/material/TableRow";
-import { AppRootState, useAppDispatch } from "app/store";
+import { AppRootState } from "app/store";
+import dayjs from "dayjs";
 import { AddNewArchiveRequest } from "feature/main/AddNewArchiveRequest/UI/AddNewArchiveRequest";
 import { TablePaginationActions } from "feature/main/PagePagination/PagePagination";
 import * as React from "react";
 import { useSelector } from "react-redux";
 import { EnhancedTableHead } from "../EnhancedTableHead/EnhancedTableHead";
 import { DataArchive, DataArchiveFilters, QuickTransition, Status } from "../module/data-types";
-import CachedIcon from "@mui/icons-material/Cached";
-import dayjs from "dayjs";
-import { setDataFiltersAC } from "../module/data-reducer";
 
 function descendingComparator<T extends { date: string | number }>(a: T, b: T) {
   const dateFormat = "DD.MM.YYYY";
@@ -54,12 +53,12 @@ export const Main = () => {
   };
 
   let filteredRows = rows;
-  console.log(filteredRows.length)
+  console.log(filteredRows.length);
 
   if (filterValues.keyword !== Status.ALL) {
     filteredRows = rows.filter((el) => el.processingStatus === filterValues.keyword);
   }
-    console.log(filteredRows.length)
+  console.log(filteredRows.length);
 
   //=====================================================================================================
   const today = dayjs();
@@ -75,7 +74,7 @@ export const Main = () => {
           const rowDate = dayjs(el.date, dateFormat);
           return rowDate.isSame(currentDate, "day");
         });
-        filteredRows.map((el) => {
+        filteredRows.map(function (el) {
           console.log(el.date + " :day");
         });
         break;
@@ -103,7 +102,7 @@ export const Main = () => {
           const rowDate = dayjs(el.date, dateFormat);
           return rowDate.isAfter(monthStart) && rowDate.isBefore(monthEnd);
         });
-        filteredRows.map((el) => {
+        filteredRows.map(function (el) {
           console.log(el.date + " :month");
         });
         break;
@@ -114,7 +113,7 @@ export const Main = () => {
     }
   }
   //=====================================================================================================
-  console.log(filteredRows.length)
+  console.log(filteredRows);
 
   if (filterValues.dateFrom && filterValues.dateTo) {
     const startDate = dayjs(filterValues.dateFrom, dateFormat).startOf("day");
@@ -125,18 +124,18 @@ export const Main = () => {
         const rowDate = dayjs(el.date, dateFormat);
         console.log("rowDate: ПЕРВОЕ", rowDate.format(dateFormat));
         return rowDate.isSame(startDate, "day");
-      })
-    // } else {
-    //   filteredRows = filteredRows.filter((el , index) => {
-    //     const rowDate = dayjs(el.date, dateFormat);
-    //     console.log(`rowDate: ${index +1}`, rowDate.format(dateFormat));
-    //     return rowDate.isAfter(startDate) && rowDate.isBefore(endDate);
-    //   });
-    //   console.log(filteredRows.length);
+      });
+    } else {
+      filteredRows = filteredRows.filter((el, index) => {
+        const rowDate = dayjs(el.date, dateFormat);
+        console.log(`rowDate: ${index + 1}`, rowDate.format(dateFormat));
+        return rowDate.isAfter(startDate) && rowDate.isBefore(endDate);
+      });
+      console.log(filteredRows);
     }
   }
 
-  console.log(filteredRows.length)
+  console.log(filteredRows.length);
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
