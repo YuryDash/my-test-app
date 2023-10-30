@@ -5,10 +5,10 @@ import IconButton from "@mui/material/IconButton";
 import SpeedDialIcon from "@mui/material/SpeedDialIcon";
 import { COLORS } from "common/colors/colors";
 import { useState } from "react";
-import { DialogHeader } from "feature/main/AddNewArchiveRequest/DialogHeader/DialogHeader";
-import { EditArchive } from "feature/main/AddNewArchiveRequest/EditArchive/EditArchive";
-import { AddFile } from "feature/main/AddNewArchiveRequest/AddFile/AddFile";
-import { Note } from "../Note/Note";
+import { DialogHeader } from "feature/main/components/AddNewArchiveRequest/DialogHeader/DialogHeader";
+import { EditArchive } from "feature/main/components/AddNewArchiveRequest/EditArchive/EditArchive";
+import { AddFile } from "feature/main/components/AddNewArchiveRequest/AddFile/AddFile";
+import { Note } from "feature/main/components/AddNewArchiveRequest/Note/Note";
 
 const StyleModal = styled(Modal)({
   display: "flex",

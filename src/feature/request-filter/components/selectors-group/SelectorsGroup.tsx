@@ -5,6 +5,7 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { COLORS } from "common/colors/colors";
 import { useAppDispatch } from "app/store";
 import { setDataFiltersAC } from "feature/main/module/data-reducer";
+import { Period, TypeDoc } from "feature/main/module/data-types";
 
 export const SelectorsGroup = () => {
   const styles = {
@@ -22,11 +23,12 @@ export const SelectorsGroup = () => {
   const dispatch = useAppDispatch();
 
   const handleChangeSelectors = (event: SelectChangeEvent) => {
-    const selectValue = event.target.value;
-    if (+selectValue < 6) {
-      dispatch(setDataFiltersAC({ documentDirection: selectValue.toString() }));
-    } else {
-      dispatch(setDataFiltersAC({ documentType: selectValue.toString() }));
+    const selectValue = parseInt(event.target.value);
+    if (selectValue <= 6) {
+      dispatch(setDataFiltersAC({ documentDirection: selectValue }));
+    }
+    if (selectValue >= 7) {
+      dispatch(setDataFiltersAC({ documentType: selectValue }));
     }
   };
 
@@ -42,12 +44,13 @@ export const SelectorsGroup = () => {
             id="demo-simple-select"
             onChange={handleChangeSelectors}
           >
-            <MenuItem value={0}>Месяц</MenuItem>
-            <MenuItem value={1}>Первый квартал</MenuItem>
-            <MenuItem value={2}>Второй квартал</MenuItem>
-            <MenuItem value={3}>Третий квартал</MenuItem>
-            <MenuItem value={4}>Четвертый квартал</MenuItem>
-            <MenuItem value={5}>Год</MenuItem>
+            <MenuItem value={Period.PERIOD_ALL}>Все</MenuItem>
+            <MenuItem value={Period.PERIOD_MONTH}>Месяц</MenuItem>
+            <MenuItem value={Period.PERIOD_Q1}>Первый квартал</MenuItem>
+            <MenuItem value={Period.PERIOD_Q2}>Второй квартал</MenuItem>
+            <MenuItem value={Period.PERIOD_Q3}>Третий квартал</MenuItem>
+            <MenuItem value={Period.PERIOD_Q4}>Четвертый квартал</MenuItem>
+            <MenuItem value={Period.PERIOD_YEAR}>Год</MenuItem>
           </Select>
         </FormControl>
       </div>
@@ -57,13 +60,14 @@ export const SelectorsGroup = () => {
         <FormControl>
           <Select
             sx={styles}
-            defaultValue={"6"}
+            defaultValue={"9"}
             labelId="demo-simple-select-label"
             id="demo-simple-select"
             onChange={handleChangeSelectors}
           >
-            <MenuItem value={6}>Входящий</MenuItem>
-            <MenuItem value={7}>Исходящий</MenuItem>
+            <MenuItem value={TypeDoc.all}>Все</MenuItem>
+            <MenuItem value={TypeDoc.outgoing}>Входящий</MenuItem>
+            <MenuItem value={TypeDoc.incoming}>Исходящий</MenuItem>
           </Select>
         </FormControl>
       </div>

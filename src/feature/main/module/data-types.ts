@@ -13,24 +13,29 @@ export enum Status {
   ALL = 4,
 }
 
-export enum TypeDoc {
-  outgoing,
-  incoming,
-}
 export enum Period {
-  PERIOD_MONTH = "Месяц",
-  PERIOD_Q1 = "Q1",
-  PERIOD_Q2 = "Q2",
-  PERIOD_Q3 = "Q3",
-  PERIOD_Q4 = "Q4",
-  PERIOD_YEAR = "Год",
+  PERIOD_ALL = 0,
+  PERIOD_MONTH = 1,
+  PERIOD_Q1 = 2,
+  PERIOD_Q2 = 3,
+  PERIOD_Q3 = 4,
+  PERIOD_Q4 = 5,
+  PERIOD_YEAR = 6,
 }
+
+export enum TypeDoc {
+  outgoing = 7,
+  incoming = 8,
+  all = 9,
+}
+
 export enum QuickTransition {
   NOW = 5,
   WEEK = 6,
   MONTH = 7,
   ALL = 4,
 }
+
 export type Data = {
   date: string;
   status: Status;
@@ -57,8 +62,8 @@ export type DataArchiveFilters = {
   dateFrom: string;
   dateTo: string;
   keyword: Status | QuickTransition;
-  documentType: string;
-  documentDirection: string;
+  documentType: TypeDoc;
+  documentDirection: Period;
 };
 
 export type PreparationArchiveFilters = Partial<DataArchiveFilters>;

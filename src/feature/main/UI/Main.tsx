@@ -11,12 +11,13 @@ import TableContainer from "@mui/material/TableContainer";
 import TableRow from "@mui/material/TableRow";
 import { AppRootState } from "app/store";
 import dayjs from "dayjs";
-import { AddNewArchiveRequest } from "feature/main/AddNewArchiveRequest/UI/AddNewArchiveRequest";
-import { TablePaginationActions } from "feature/main/PagePagination/PagePagination";
+import { AddNewArchiveRequest } from "feature/main/components/AddNewArchiveRequest/UI/AddNewArchiveRequest";
+import { TablePaginationActions } from "feature/main/components/PagePagination/PagePagination";
 import * as React from "react";
 import { useSelector } from "react-redux";
-import { EnhancedTableHead } from "../EnhancedTableHead/EnhancedTableHead";
-import { DataArchive, DataArchiveFilters, QuickTransition, Status } from "../module/data-types";
+import { EnhancedTableHead } from "../components/EnhancedTableHead/EnhancedTableHead";
+import { DataArchive, DataArchiveFilters, Period, Status, TypeDoc } from "../module/data-types";
+import { dateFormat } from "../module/data-reducer";
 
 function descendingComparator<T extends { date: string | number }>(a: T, b: T) {
   const dateFormat = "DD.MM.YYYY";
@@ -48,96 +49,73 @@ export const Main = () => {
   const rows = useSelector<AppRootState, DataArchive[]>((state) => state.dataArchive.list);
   const filterValues = useSelector<AppRootState, DataArchiveFilters>((state) => state.dataArchive.filters);
 
+  const periodValues = {
+    0: "forTypeValue",
+    1: "Месяц",
+    2: "Q1",
+    3: "Q2",
+    4: "Q3",
+    5: "Q4",
+    6: "Год",
+  };
+
   const handleRequestSort = () => {
     setOrder(order === "asc" ? "desc" : "asc");
   };
 
   let filteredRows = rows;
-  console.log(filteredRows.length);
+
+  if (filterValues.documentDirection === Period.PERIOD_MONTH) {
+    filteredRows = rows.filter((el) => el.taxPeriodType === Period.PERIOD_MONTH);
+  } else if (filterValues.documentDirection === Period.PERIOD_Q1) {
+    filteredRows = rows.filter((el) => el.taxPeriodType === Period.PERIOD_Q1);
+  } else if (filterValues.documentDirection === Period.PERIOD_Q2) {
+    filteredRows = rows.filter((el) => el.taxPeriodType === Period.PERIOD_Q2);
+  } else if (filterValues.documentDirection === Period.PERIOD_Q3) {
+    filteredRows = rows.filter((el) => el.taxPeriodType === Period.PERIOD_Q3);
+  } else if (filterValues.documentDirection === Period.PERIOD_Q4) {
+    filteredRows = rows.filter((el) => el.taxPeriodType === Period.PERIOD_Q4);
+  } else if (filterValues.documentDirection === Period.PERIOD_YEAR) {
+    filteredRows = rows.filter((el) => el.taxPeriodType === Period.PERIOD_YEAR);
+  } else {
+    filteredRows = rows;
+  }
+
+  if (filterValues.documentType === TypeDoc.incoming) {
+    debugger;
+    filteredRows = rows.filter((el) => el.documentType !== TypeDoc.incoming);
+  } else if (filterValues.documentType === TypeDoc.outgoing) {
+    debugger;
+    filteredRows = rows.filter((el) => el.documentType !== TypeDoc.outgoing);
+  } else {
+    filteredRows = filteredRows;
+  }
 
   if (filterValues.keyword !== Status.ALL) {
     filteredRows = rows.filter((el) => el.processingStatus === filterValues.keyword);
   }
-  console.log(filteredRows.length);
 
-  //=====================================================================================================
-  const today = dayjs();
-  const dateFormat = "DD.MM.YYYY";
-
-  //=====================================================================================================
-
-  if (filterValues.keyword !== Status.ALL && filterValues.keyword >= 5) {
-    switch (filterValues.keyword) {
-      case QuickTransition.NOW:
-        const currentDate = today.startOf("day");
-        filteredRows = rows.filter((el) => {
-          const rowDate = dayjs(el.date, dateFormat);
-          return rowDate.isSame(currentDate, "day");
-        });
-        filteredRows.map(function (el) {
-          console.log(el.date + " :day");
-        });
-        break;
-
-      case QuickTransition.WEEK:
-        const weekStart = dayjs().subtract(7, "day").startOf("day");
-        const weekEnd = dayjs().endOf("day");
-        filteredRows = rows.filter((el) => {
-          const rowDate = dayjs(el.date, dateFormat);
-          return (
-            (rowDate.isSame(weekStart, "day") || rowDate.isAfter(weekStart, "day")) &&
-            (rowDate.isSame(weekEnd, "day") || rowDate.isBefore(weekEnd, "day") || rowDate.isSame(weekEnd, "day"))
-          );
-        });
-
-        filteredRows.map((el) => {
-          console.log(el.date + " :week");
-        });
-        break;
-
-      case QuickTransition.MONTH:
-        const monthStart = today.startOf("month");
-        const monthEnd = today.endOf("month");
-        filteredRows = rows.filter((el) => {
-          const rowDate = dayjs(el.date, dateFormat);
-          return rowDate.isAfter(monthStart) && rowDate.isBefore(monthEnd);
-        });
-        filteredRows.map(function (el) {
-          console.log(el.date + " :month");
-        });
-        break;
-
-      default:
-        filteredRows = rows;
-        break;
-    }
-  }
-  //=====================================================================================================
-  console.log(filteredRows);
-
-  if (filterValues.dateFrom && filterValues.dateTo) {
+  if (filterValues.dateFrom && filterValues.dateTo && filterValues.keyword >= 5) {
     const startDate = dayjs(filterValues.dateFrom, dateFormat).startOf("day");
     const endDate = dayjs(filterValues.dateTo, dateFormat).endOf("day");
 
     if (startDate.isSame(endDate, "day")) {
-      filteredRows = filteredRows.filter((el) => {
+      filteredRows = rows.filter((el) => {
         const rowDate = dayjs(el.date, dateFormat);
-        console.log("rowDate: ПЕРВОЕ", rowDate.format(dateFormat));
         return rowDate.isSame(startDate, "day");
       });
     } else {
-      filteredRows = filteredRows.filter((el, index) => {
+      filteredRows = rows.filter((el) => {
         const rowDate = dayjs(el.date, dateFormat);
-        console.log(`rowDate: ${index + 1}`, rowDate.format(dateFormat));
-        return rowDate.isAfter(startDate) && rowDate.isBefore(endDate);
+        const isSameAsStartDate = rowDate.diff(startDate, "day") === 0;
+        const isAfterStartDate = rowDate.isAfter(startDate, "day");
+        const isBeforeEndDate = rowDate.isBefore(endDate, "day");
+        return isSameAsStartDate || (isAfterStartDate && isBeforeEndDate);
       });
-      console.log(filteredRows);
     }
   }
 
-  console.log(filteredRows.length);
-
-  const handleChangePage = (event: unknown, newPage: number) => {
+  const handleChangePage = (_: unknown, newPage: number) => {
     setPage(newPage);
   };
 
@@ -167,7 +145,7 @@ export const Main = () => {
               rowCount={filteredRows.length}
             />
             <TableBody>
-              {visibleRows.map((row) => {
+              {visibleRows.map((row: DataArchive) => {
                 let lol =
                   row.processingStatus === Status.processed ? (
                     <DoneIcon color="success" />
@@ -184,8 +162,8 @@ export const Main = () => {
                     </TableCell>
                     <TableCell align="right">{lol}</TableCell>
                     <TableCell align="right">№ {row.originalDocumentNumber}</TableCell>
-                    <TableCell align="right">{row.documentType ? "входящий" : "исходящий"}</TableCell>
-                    <TableCell align="right">{row.taxPeriodType}</TableCell>
+                    <TableCell align="right">{row.documentType === 8 ? "входящий" : "исходящий"}</TableCell>
+                    <TableCell align="right">{periodValues[row.taxPeriodType]}</TableCell>
                     <TableCell align="right">{row.organizationName}</TableCell>
                   </TableRow>
                 );

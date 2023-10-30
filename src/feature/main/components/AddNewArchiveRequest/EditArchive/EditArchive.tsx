@@ -1,8 +1,6 @@
 import Grid from "@mui/material/Grid";
-import { RootButton, newIndicatorStyle } from "./style";
+import { RootButton, newIndicatorStyle } from "feature/main/components/AddNewArchiveRequest/EditArchive/style";
 import { COLORS } from "common/colors/colors";
-
-
 
 export const EditArchive = () => {
   return (

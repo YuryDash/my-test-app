@@ -4,7 +4,7 @@ import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
 import TableSortLabel from "@mui/material/TableSortLabel";
 
-import { Data } from "../module/data-types";
+import { Data } from "feature/main/module/data-types";
 
 type Order = "asc" | "desc";
 
@@ -71,11 +71,7 @@ export function EnhancedTableHead(props: EnhancedTableProps) {
     <TableHead sx={{ backgroundColor: "#DCECF4" }}>
       <TableRow>
         {headCells.map((headCell) => (
-          <TableCell
-            key={headCell.id}
-            align={headCell.numeric ? "right" : "left"}
-            sx={{ padding: "15px 20px" }}
-          >
+          <TableCell key={headCell.id} align={headCell.numeric ? "right" : "left"} sx={{ padding: "15px 20px" }}>
             {headCell.id === "date" ? (
               <TableSortLabel
                 active={orderBy === headCell.id}

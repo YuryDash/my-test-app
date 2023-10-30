@@ -12,20 +12,15 @@ import { setDataFiltersAC } from "feature/main/module/data-reducer";
 export const DatePick = () => {
   const startDate = useSelector<AppRootState, string>((state) => state.dataArchive.filters.dateFrom);
   const endDate = useSelector<AppRootState, string>((state) => state.dataArchive.filters.dateTo);
-  const dispatch = useAppDispatch()
-
+  const dispatch = useAppDispatch();
 
   const [startValue, setStartValue] = React.useState<Dayjs | null>(dayjs(startDate));
-  // const [endValue, setEndValue] = React.useState<Dayjs | null>(dayjs(endDate, "DD.MM.YYYY").startOf("day"));
   const [endValue, setEndValue] = React.useState<Dayjs | null>(dayjs(endDate, "DD.MM.YYYY").startOf("day"));
-
-// console.log( startValue?.format('DD.MM.YYYY') + ' :startValue' + ' ' + endValue?.format('DD.MM.YYYY') + ' :endValue' );
-
 
   React.useEffect(() => {
     setStartValue(dayjs(startDate, "DD.MM.YYYY"));
   }, [startDate]);
-  
+
   React.useEffect(() => {
     setEndValue(dayjs(endDate, "DD.MM.YYYY").startOf("day"));
   }, [endDate]);
@@ -35,15 +30,14 @@ export const DatePick = () => {
   };
 
   const onChangeStartDateValue = (newValue: Dayjs | null) => {
-    setStartValue(newValue)
-    dispatch(setDataFiltersAC({dateFrom: dayjs(newValue).format('DD.MM.YYYY')}))
-  }  
+    setStartValue(newValue);
+    dispatch(setDataFiltersAC({ dateFrom: dayjs(newValue).format("DD.MM.YYYY") }));
+  };
   const onChangeEndDateValue = (newValue: Dayjs | null) => {
-    setEndValue(newValue)
-    dispatch(setDataFiltersAC({dateTo: dayjs(newValue).format('DD.MM.YYYY')}))
-  }
+    setEndValue(newValue);
+    dispatch(setDataFiltersAC({ dateTo: dayjs(newValue).format("DD.MM.YYYY") }));
+  };
 
-  
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <div style={{ color: COLORS.GRAY }}>Период</div>
